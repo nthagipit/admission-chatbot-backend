@@ -1,0 +1,40 @@
+{
+  "generation_timestamp": "2026-10-27T07:59:11.176689+00:00",
+  "source_pdf": "dsk-thong-tin-tuyen-sinh-2026-new-0162026-25-ctdt-1950-ct.pdf",
+  "expected_pages": 58,
+  "actual_pages": 58,
+  "quantitative_metrics": {
+    "total_pages": 58,
+    "total_blocks": 134,
+    "block_counts_by_type": {
+      "text": 47,
+      "heading": 30,
+      "table": 57
+    },
+    "empty_blocks_count": 0,
+    "invalid_coords_count": 0,
+    "table_blocks_count": 57,
+    "table_chains_count": 8,
+    "repeated_headers_removed_count": 8,
+    "cross_page_spliced_rows_count": 32,
+    "total_normalized_table_rows": 204,
+    "total_cells_count": 1448,
+    "empty_cells_count": 410,
+    "empty_cell_ratio": 0.2831,
+    "empty_cell_ratio_interpretation": {
+      "ratio": 0.2831,
+      "percentage": "28.31%",
+      "status": "ACCEPTABLE",
+      "reason": "Tỷ lệ ô trống 28.31% là đặc trưng cấu trúc tự nhiên của tài liệu tuyển sinh do các bảng sử dụng ô gộp theo chiều dọc (merged cells) trong PDF gốc (ví dụ: bảng môn thi HSG trang 2-3 và bảng 24 ngành tuyển sinh trang 31-58 nơi một ngành hoặc nhóm môn thi được gộp chung cho nhiều dòng phương thức xét tuyển). pdfplumber trích xuất các vị trí ô gộp này thành ô rỗng. Tỷ lệ này không phản ánh lỗi trích xuất dữ liệu mà phản ánh cấu trúc phân cấp bảng của tài liệu gốc."
+    },
+    "metadata_mismatches_count": 0,
+    "distinct_source_pages_count": 58
+  },
+  "validation_results_by_group": {
+    "group_1_geometry_and_structure": "PASS",
+    "group_2_table_integrity": "PASS",
+    "group_3_domain_sanity": "PASS",
+    "group_4_serialization_and_metrics": "PASS"
+  },
+  "overall_status": "PASS"
+}

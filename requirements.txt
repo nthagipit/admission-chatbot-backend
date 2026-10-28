@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+pgvector
+alembic
+pydantic
+pydantic-settings
+python-dotenv
+langchain
+langchain-google-genai
+pdfplumber
+langchain-text-splitters
+passlib[bcrypt]==1.7.4
+bcrypt==4.3.0

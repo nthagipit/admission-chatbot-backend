@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+    db:
+        image: pgvector/pgvector:pg16
+        container_name: rag_postgres
+        restart: always
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_USER: admissions_user
+            POSTGRES_PASSWORD: thoha2004
+            POSTGRES_DB: admissions_db
+        volumes:
+            - admissions_db:/var/lib/postgresql/data
+
+volumes:
+    admissions_db:
