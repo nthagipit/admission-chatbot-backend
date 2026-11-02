@@ -29,3 +29,7 @@ class DataResponse(ResponseSchemaBase, GenericModel, Generic[T]):
     @classmethod
     def success_response(cls, data: T):
         return cls(code='000', message='success', data=data)
+
+    @classmethod
+    def error(cls, status_code: int, detail: str):
+        return cls(code=str(status_code), message=detail, data=None)
