@@ -20,7 +20,7 @@ class Settings:
     GOOGLE_REDIRECT_URI: str = os.getenv("GOOGLE_REDIRECT_URI")
     SESSION_SECRET_KEY: str = os.getenv("SESSION_SECRET_KEY")
     NEON_POSTGRESQL: str = os.getenv("NEON_POSTGRESQL")
-    CORS_ORIGINS: str = os.getent("CORS_ORIGINS")
+    CORS_ORIGINS: str = os.getenv("CORS_ORIGINS")
     
 
 
