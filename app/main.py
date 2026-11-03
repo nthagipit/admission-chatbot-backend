@@ -5,8 +5,16 @@ from fastapi.responses import JSONResponse
 from app.schemas.base_schema import DataResponse
 from app.core.exception import AppException
 from fastapi import FastAPI, Request,status
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router as v1_router
+
+
+origins = [
+    "http://localhost:3000",
+    settings.CORS_ORIGINS
+]
+
 
 app = FastAPI(
     title="Admissions Chatbot API",
@@ -18,8 +26,16 @@ app.add_middleware(
     SessionMiddleware, 
     secret_key=settings.SESSION_SECRET_KEY,
     same_site="lax",
-    https_only=False
+    https_only=True
 )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.exception_handler(AppException)
 def handle_app_exception(request, exc):
@@ -53,6 +69,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             "errors": custom_errors
         }
     )
+
+
+
 
 @app.get("/")
 async def root():
