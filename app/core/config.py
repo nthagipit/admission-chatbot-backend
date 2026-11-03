@@ -19,6 +19,7 @@ class Settings:
     GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET")
     GOOGLE_REDIRECT_URI: str = os.getenv("GOOGLE_REDIRECT_URI")
     SESSION_SECRET_KEY: str = os.getenv("SESSION_SECRET_KEY")
+    NEON_POSTGRESQL: str = os.getenv("NEON_POSTGRESQL")
     
 
 
