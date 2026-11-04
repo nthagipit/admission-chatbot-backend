@@ -12,8 +12,13 @@ from app.api.v1.router import api_router as v1_router
 
 origins = [
     "http://localhost:3000",
-    settings.CORS_ORIGINS
 ]
+
+if settings.CORS_ORIGINS:
+    origins.extend(
+        [origin.strip() for origin in settings.CORS_ORIGINS.split(",") 
+        if origin.strip()]
+    )
 
 
 app = FastAPI(
@@ -21,7 +26,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-app.include_router(v1_router, prefix="/api/v1")
 app.add_middleware(
     SessionMiddleware, 
     secret_key=settings.SESSION_SECRET_KEY,
@@ -38,6 +42,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(v1_router, prefix="/api/v1")
 
 @app.exception_handler(AppException)
 def handle_app_exception(request, exc):
