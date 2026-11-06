@@ -60,6 +60,10 @@ def register(data: RegisterRequestSchema, db: Session):
         db.refresh(new_user)
 
         return build_auth_response(new_user)
+    except AppException:
+        db.rollback()
+        raise
+    
     except Exception as e:
         db.rollback()
         logger.error(f"Register failed: {str(e)}", exc_info=True)
