@@ -21,7 +21,10 @@ class Settings:
     SESSION_SECRET_KEY: str = os.getenv("SESSION_SECRET_KEY")
     NEON_POSTGRESQL: str = os.getenv("NEON_POSTGRESQL")
     CORS_ORIGINS: str = os.getenv("CORS_ORIGINS")
-    
+    SUPABASE_URL: str = os.getenv("SUPABASE_URL", "")
+    SUPABASE_SECRET_KEY: str = os.getenv("SUPABASE_SECRET_KEY", "")
+    SUPABASE_BUCKET_NAME: str = os.getenv("SUPABASE_BUCKET_NAME", "admissions-documents")
+    COOKIE_SECURE: bool = os.getenv("COOKIE_SECURE", "false").lower() == "true"
 
 
 settings = Settings()

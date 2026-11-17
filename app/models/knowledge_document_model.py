@@ -1,5 +1,5 @@
 from typing import TYPE_CHECKING
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, String, Boolean, Integer, Text
 from sqlalchemy.orm import mapped_column,relationship, Mapped
 from app.models.base_model import BaseModel
 
@@ -14,6 +14,11 @@ class KnowledgeDocument(BaseModel):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     file_path: Mapped[str] = mapped_column(String(255), nullable=False)
     status: Mapped[str] = mapped_column(String(50), nullable=False)
+
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    file_size: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    total_pages: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     user: Mapped["User"] = relationship(back_populates = 'knowledge_documents')
 
