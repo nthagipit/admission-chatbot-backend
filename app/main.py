@@ -1,3 +1,4 @@
+import logging
 from app.core.config import settings
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.exceptions import RequestValidationError
@@ -9,6 +10,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router as v1_router
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    datefmt="%H:%M:%S"
+)
 
 origins = [
     "http://localhost:3000",
@@ -30,7 +36,7 @@ app.add_middleware(
     SessionMiddleware, 
     secret_key=settings.SESSION_SECRET_KEY,
     same_site="lax",
-    https_only=True
+    https_only=False
 )
 
 

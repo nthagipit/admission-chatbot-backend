@@ -33,3 +33,10 @@ class DataResponse(ResponseSchemaBase, GenericModel, Generic[T]):
     @classmethod
     def error(cls, status_code: int, detail: str):
         return cls(code=str(status_code), message=detail, data=None)
+
+class PageResponse(BaseModel, Generic[T]):
+    items: list[T]       
+    total: int           
+    page: int           
+    page_size: int      
+    total_pages: int 

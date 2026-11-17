@@ -18,3 +18,5 @@ email-validator
 Authlib 
 httpx 
 itsdangerous
+supabase
+python-multipart

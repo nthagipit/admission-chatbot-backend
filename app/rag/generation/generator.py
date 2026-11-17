@@ -1,6 +1,5 @@
 import logging
 from typing import Any
-
 from app.rag.generation.prompts import CONTEXT_PROMPT
 from app.rag.generation.llm_builder import llm_builder, llm_fast_builder
 
@@ -99,7 +98,7 @@ def generate_answer(query: str, chunks: list[dict[str, Any]]) -> dict[str, Any]:
     - Nếu chunks rỗng: trả về thông báo chuẩn ngay lập tức (US03), không tốn quota LLM.
     - Bọc xử lý lỗi API/mạng an toàn, không làm gián đoạn luồng trò chuyện.
     """
-    # 1. Fallback sớm khi không có tài liệu phù hợp (US03)
+    # 1. Fallback sớm khi không có tài liệu phù hợp
     if not chunks:
         return {
             "answer": FALLBACK_NO_INFO_ANSWER,
@@ -123,8 +122,29 @@ def generate_answer(query: str, chunks: list[dict[str, Any]]) -> dict[str, Any]:
             "citations": extract_citations(chunks),
         }
     except Exception as e:
-        logger.error("Lỗi khi gọi mô hình sinh câu trả lời LLM: %s", e, exc_info=True)
+        logger.error("Erroring when calling to model LLM AI: %s", e, exc_info=True)
         return {
             "answer": FALLBACK_ERROR_ANSWER,
             "citations": extract_citations(chunks),
         }
+
+def generate_answer_stream(query: str, chunks: list[str, Any]):
+    """
+    Generator yield từng token từ LLM dưới dạng stream.
+    """
+    if not chunks:
+        yield FALLBACK_NO_INFO_ANSWER
+        return 
+    
+    try:
+        context = format_context(chunks)
+        formatted_prompt = CONTEXT_PROMPT.format(context=context, query=query)
+
+        for chunk in llm_fast_builder.stream(formatted_prompt):
+            content = _extract_text(chunk.content)
+            if content:
+                yield content
+        
+    except Exception as e:
+        logger.error("Erroring when LLM generates the answer: %s", e, exc_info=True)
+        yield FALLBACK_ERROR_ANSWER
