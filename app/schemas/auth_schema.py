@@ -16,6 +16,8 @@ class RegisterRequestSchema(BaseModel):
 class AuthResponseSchema(BaseModel):
     access_token: str
     expires_access_token: int
+    refresh_token: str
+    expires_refresh_token: int
     token_type: str = "Bearer"
 
 class RefreshTokenResponseSchema(BaseModel):
