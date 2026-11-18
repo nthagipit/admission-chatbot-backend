@@ -83,6 +83,8 @@ def build_auth_response(user: User, response: Response):
     data_response = AuthResponseSchema(
         access_token=access_token,
         expires_access_token=settings.ACCESS_TOKEN_EXPIRE,
+        refresh_token=refresh_token,
+        expires_refresh_token=settings.REFRESH_TOKEN_EXPIRE,
         token_type="Bearer",
     )
 
