@@ -24,3 +24,6 @@ class RefreshTokenResponseSchema(BaseModel):
     access_token: str
     expires_access_token: int
     token_type: str = "Bearer"
+
+class GoogleLoginRequest(BaseModel):
+    id_token: str

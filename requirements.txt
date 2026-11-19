@@ -20,3 +20,5 @@ httpx
 itsdangerous
 supabase
 python-multipart
+google-auth
+requests

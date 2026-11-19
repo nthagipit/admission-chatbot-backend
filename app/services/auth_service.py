@@ -1,5 +1,7 @@
 
+from google.auth.transport import requests
 import logging
+from google.oauth2 import id_token
 from app.core.config import settings
 from fastapi import Response, Request
 from app.core.security import verify_refresh_token
@@ -10,12 +12,51 @@ from sqlalchemy.orm.session import Session
 from app.core.exception import AppException
 from app.schemas.base_schema import DataResponse
 from app.enums.user_enum import AuthProviderEnum
-from app.schemas.auth_schema import LoginRequestSchema
-from app.schemas.auth_schema import RefreshTokenResponseSchema
 from app.schemas.auth_schema import AuthResponseSchema, RegisterRequestSchema
+from app.schemas.auth_schema import RefreshTokenResponseSchema, LoginRequestSchema, GoogleLoginRequest
 
 
 logger = logging.getLogger("app.services.auth_service")
+
+def _get_or_create_google_user(
+    db: Session,
+    email: str,
+    provider_id: str,
+    full_name: str,
+    avatar_url: str | None,
+) -> User:
+    user = (
+        db.query(User)
+        .filter(
+            User.auth_provider == AuthProviderEnum.GOOGLE,
+            User.provider_id == provider_id,
+        )
+        .first()
+    )
+
+    if user:
+        return user
+
+    existing_user = db.query(User).filter(User.email == email).first()
+    if existing_user:
+        raise AppException(
+            status_code=400,
+            message="Email already registered with another login method",
+        )
+
+    user = User(
+        email=email,
+        provider_id=provider_id,
+        auth_provider=AuthProviderEnum.GOOGLE,
+        full_name=full_name,
+        avatar_url=avatar_url,
+        password_hash=None,
+    )
+
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
 
 def login (data: LoginRequestSchema, response: Response, db: Session):
     try:
@@ -105,29 +146,14 @@ def google_login(user_info: dict, response: Response, db: Session):
         if not email or not provider_id:
             raise AppException(status_code = 400, message = "Invalid Google user info")
         
-        user = db.query(User).filter(
-            User.auth_provider == AuthProviderEnum.GOOGLE,
-            User.provider_id == provider_id
-        ).first()
+        user = _get_or_create_google_user(
+            db=db,
+            email=email,
+            provider_id=provider_id,
+            full_name=user_info.get("name", ""),
+            avatar_url=user_info.get("picture", "")
+        )
 
-        if not user:
-            existing_user = db.query(User).filter(User.email == email).first()
-            if existing_user:
-                raise AppException(status_code = 400, message = "Email already registered with another login method")
-            
-            user = User(
-                email=email,
-                provider_id=provider_id,
-                auth_provider=AuthProviderEnum.GOOGLE,
-                full_name=user_info.get("name", ""),
-                avatar_url=user_info.get("picture", ""),
-                password_hash=None,
-            )
-
-            db.add(user)
-            db.commit()
-            db.refresh(user)
-        
         return build_auth_response(user, response)
     except AppException:
         raise
@@ -167,3 +193,36 @@ def refresh_access_token( request: Request, response: Response, db: Session):
 def logout(response: Response):
     clear_refresh_cookie(response)
     return DataResponse.custom_response(code="200",data =None, message="Logout successfully")
+
+def google_login_mobile(body: GoogleLoginRequest, response: Response, db: Session):
+    try:
+        id_info = id_token.verify_oauth2_token(
+            body.id_token,
+            requests.Request(),
+            settings.GOOGLE_CLIENT_ID
+        )
+
+        email = id_info.get("email")
+        full_name = id_info.get("name", "")
+        avatar_url = id_info.get("picture", None)
+        provider_id = id_info.get("sub")
+
+        if not email:
+            raise AppException(status_code=400, message="Don't get email from google account")
+        
+        user = _get_or_create_google_user(
+            db=db,
+            email=email,
+            provider_id=provider_id,
+            full_name=full_name,
+            avatar_url=avatar_url
+        )
+        
+        return build_auth_response(user, response)
+    except AppException:
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Google login failed: {str(e)}", exc_info=True)
+        raise AppException(status_code=400, message='Google login failed')
+
