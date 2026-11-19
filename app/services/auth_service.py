@@ -199,7 +199,7 @@ def google_login_mobile(body: GoogleLoginRequest, response: Response, db: Sessio
         id_info = id_token.verify_oauth2_token(
             body.id_token,
             requests.Request(),
-            settings.GOOGLE_CLIENT_ID
+            audience=[settings.GOOGLE_CLIENT_ID, settings.GOOGLE_IOS_CLIENT_ID]
         )
 
         email = id_info.get("email")
