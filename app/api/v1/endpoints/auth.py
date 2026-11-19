@@ -1,4 +1,5 @@
 
+from app.schemas.auth_schema import GoogleLoginRequest
 from app.schemas.auth_schema import RefreshTokenResponseSchema
 import logging
 from app.core.exception import AppException
@@ -63,3 +64,7 @@ async def refresh_token(request: Request, response: Response, db: Session = Depe
 @router.post("/logout", description="Logout and clear HttpOnly Cookie", response_model=DataResponse[None])
 async def logout(response: Response):
     return auth_service.logout(response)
+
+@router.post("/google", description="Login google app",  response_model=DataResponse[AuthResponseSchema])
+async def google_login_mobile(data: GoogleLoginRequest, response: Response, db: Session = Depends(get_db)):
+    return auth_service.google_login_mobile(data, response, db)
