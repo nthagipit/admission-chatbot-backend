@@ -126,7 +126,7 @@ def view_document_pdf(document_id: str, db: Session = Depends(get_db)):
     doc = db.query(KnowledgeDocument).filter(
         KnowledgeDocument.id == document_id,
         KnowledgeDocument.enabled == True
-    )
+    ).first()
 
     if not doc or not doc.file_path:
         raise AppException(status_code=404, message="Tài liệu không tồn tại hoặc đã bị ẩn")
