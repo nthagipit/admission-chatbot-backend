@@ -59,6 +59,7 @@ def extract_citations(chunks: list[dict[str, Any]]) -> list[dict[str, Any]]:
     seen = set()
     for chunk in chunks:
         doc_title = chunk.get("document_title") or "Tài liệu tuyển sinh"
+        doc_id = chunk.get("document_id")
         page_num = chunk.get("page_number")
         source_pages = chunk.get("source_pages") or ([page_num] if page_num is not None else [])
         section = chunk.get("section")
@@ -66,6 +67,7 @@ def extract_citations(chunks: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if key not in seen:
             seen.add(key)
             citations.append({
+                "document_id": doc_id,
                 "document_title": doc_title,
                 "page_number": page_num,
                 "source_pages": source_pages,
