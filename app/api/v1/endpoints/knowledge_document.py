@@ -1,16 +1,17 @@
-from app.schemas.document_chunk_schema import DocumentUpdateSchema
-from app.schemas.document_chunk_schema import DocumentChunksPageSchema
-from fastapi import Query
-from app.schemas.knowledge_document_schema import DocumentListResponseSchema
-from fastapi import APIRouter, Depends, UploadFile, File, Form, BackgroundTasks
-from sqlalchemy.orm import Session
 from app.db.base import get_db
+from sqlalchemy.orm import Session
 from app.models.user_model import User
-from app.middlewares.authentication import require_roles
 from app.enums.user_enum import RoleEnum
+from app.core.exception import AppException
+from fastapi.responses import RedirectResponse
 from app.schemas.base_schema import DataResponse
-from app.schemas.knowledge_document_schema import DocumentResponseSchema
 from app.services import knowledge_document_service
+from app.middlewares.authentication import require_roles
+from app.models.knowledge_document_model import KnowledgeDocument
+from app.schemas.document_chunk_schema import DocumentChunksPageSchema,DocumentUpdateSchema
+from app.schemas.knowledge_document_schema import DocumentListResponseSchema
+from fastapi import APIRouter, Depends, UploadFile, File, Form, BackgroundTasks,Query
+from app.schemas.knowledge_document_schema import DocumentResponseSchema
 
 router = APIRouter()
 
@@ -119,3 +120,15 @@ async def reprocess_document(
 ):
     result = knowledge_document_service.reprocess_document(document_id, background_tasks, db)
     return DataResponse.custom_response(code="200", message="Document is being reprocessed", data=result)
+
+@router.get("/{document_id}/view", description="Public/User: Xem trực tiếp file PDF của tài liệu tuyển sinh")
+def view_document_pdf(document_id: str, db: Session = Depends(get_db)):
+    doc = db.query(KnowledgeDocument).filter(
+        KnowledgeDocument.id == document_id,
+        KnowledgeDocument.enabled == True
+    )
+
+    if not doc or not doc.file_path:
+        raise AppException(status_code=404, message="Tài liệu không tồn tại hoặc đã bị ẩn")
+    
+    return RedirectResponse(url=doc.file_path, status_code=307)
